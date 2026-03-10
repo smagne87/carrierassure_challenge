@@ -609,7 +609,3 @@ Built with ❤️ using:
 - **TypeScript** - Static typing
 - **Docker** - Containerization
 - **Clean Architecture** - Maintainable design
-
----
-
-**Questions?** See the [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for detailed architecture documentation.
