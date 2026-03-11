@@ -136,28 +136,32 @@ export class CarrierController {
     let ccfRecords: CCFData[];
     try {
       const fileContent = file.buffer.toString('utf-8');
-      ccfRecords = JSON.parse(fileContent);
+      const parsed = JSON.parse(fileContent) as unknown;
 
       // Validate it's an array
-      if (!Array.isArray(ccfRecords)) {
+      if (!Array.isArray(parsed)) {
         throw new BadRequestException(
           'CCF file must contain an array of carrier records',
         );
       }
 
       // Validate not empty
-      if (ccfRecords.length === 0) {
+      if (parsed.length === 0) {
         throw new BadRequestException('CCF file cannot be empty');
       }
-    } catch (error) {
+
+      ccfRecords = parsed as CCFData[];
+    } catch (error: unknown) {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new BadRequestException(`Invalid JSON format: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new BadRequestException(`Invalid JSON format: ${errorMessage}`);
     }
 
     // Dispatch command
-    const summary = await this.commandBus.execute(
+    const summary: ProcessingSummaryDto = await this.commandBus.execute(
       new ProcessCCFFileCommand(ccfRecords, correlationId),
     );
 
@@ -212,7 +216,7 @@ export class CarrierController {
     this.logger.log(`Get carriers: ${JSON.stringify(queryDto)}`);
 
     // Dispatch query
-    const carriers = await this.queryBus.execute(
+    const carriers: Carrier[] = await this.queryBus.execute(
       new GetCarriersQuery(queryDto.limit, queryDto.min_score, queryDto.skip),
     );
 
@@ -256,7 +260,9 @@ export class CarrierController {
     this.logger.log(`Get carrier by ID: ${id}`);
 
     // Dispatch query
-    const carrier = await this.queryBus.execute(new GetCarrierByIdQuery(id));
+    const carrier: Carrier | null = await this.queryBus.execute(
+      new GetCarrierByIdQuery(id),
+    );
 
     if (!carrier) {
       throw new NotFoundException(`Carrier with ID ${id} not found`);
@@ -302,11 +308,15 @@ export class CarrierController {
     this.logger.log(`Get carrier history: ${id}`);
 
     // Dispatch query
-    const history = await this.queryBus.execute(new GetCarrierHistoryQuery(id));
+    const history: ScoreHistoryEntryDto[] = await this.queryBus.execute(
+      new GetCarrierHistoryQuery(id),
+    );
 
     if (history.length === 0) {
       // Verify carrier exists
-      const carrier = await this.queryBus.execute(new GetCarrierByIdQuery(id));
+      const carrier: Carrier | null = await this.queryBus.execute(
+        new GetCarrierByIdQuery(id),
+      );
       if (!carrier) {
         throw new NotFoundException(`Carrier with ID ${id} not found`);
       }

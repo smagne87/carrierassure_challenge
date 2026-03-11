@@ -63,4 +63,8 @@ async function bootstrap() {
   logger.log(`Health check: http://localhost:${port}/api/health`);
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  const logger = new Logger('Bootstrap');
+  logger.error('Failed to start application', error);
+  process.exit(1);
+});

@@ -80,15 +80,17 @@ export abstract class BaseValueObject {
       return a.every((item, index) => this.deepEquals(item, b[index]));
     }
 
-    if (typeof a === 'object') {
-      const keysA = Object.keys(a);
-      const keysB = Object.keys(b);
+    if (typeof a === 'object' && typeof b === 'object') {
+      const objA = a as Record<string, unknown>;
+      const objB = b as Record<string, unknown>;
+      const keysA = Object.keys(objA);
+      const keysB = Object.keys(objB);
 
       if (keysA.length !== keysB.length) {
         return false;
       }
 
-      return keysA.every((key) => this.deepEquals(a[key], b[key]));
+      return keysA.every((key) => this.deepEquals(objA[key], objB[key]));
     }
 
     return false;

@@ -7,6 +7,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Connection } from 'mongoose';
 import {
   CarrierDocument,
   CarrierSchema,
@@ -38,14 +39,14 @@ import { CARRIER_REPOSITORY } from '../../domain/carrier/repositories/carrier.re
     // Configure MongoDB connection asynchronously
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>(
           'MONGODB_URI',
           'mongodb://localhost:27017/carrier-scoring',
         ),
         retryAttempts: 3,
         retryDelay: 1000,
-        connectionFactory: (connection) => {
+        connectionFactory: (connection: Connection) => {
           // Log successful connection
           connection.on('connected', () => {
             console.log('MongoDB connected successfully');

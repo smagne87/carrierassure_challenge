@@ -21,6 +21,41 @@ import { CompositeScore } from '../../../../domain/carrier/value-objects/composi
 import { CarrierDocument } from '../schemas/carrier.schema.js';
 
 /**
+ * Type for carrier persistence object (plain object for MongoDB operations)
+ */
+type CarrierPersistence = {
+  carrier_id: string;
+  dot_number: string;
+  legal_name: string;
+  safety_rating: string;
+  out_of_service_pct: number;
+  crash_total: number;
+  driver_oos_pct: number;
+  insurance_on_file: boolean;
+  authority_status: string;
+  last_inspection_date: Date | null;
+  fleet_size: number;
+  current_hash: string;
+  current_score: {
+    total: number;
+    breakdown: {
+      safetyRating: number;
+      outOfServicePct: number;
+      crashTotal: number;
+      driverOosPct: number;
+      insuranceOnFile: number;
+      authorityStatus: number;
+    };
+  };
+  score_history: Array<{
+    score: number;
+    computedAt: Date;
+  }>;
+  created_at: Date;
+  updated_at: Date;
+};
+
+/**
  * MongoDB implementation of the Carrier Repository.
  *
  * This adapter:
@@ -208,7 +243,7 @@ export class CarrierRepository implements ICarrierRepository {
    * @param carrier Carrier domain entity
    * @returns Plain object for MongoDB persistence
    */
-  private toPersistence(carrier: Carrier): any {
+  private toPersistence(carrier: Carrier): CarrierPersistence {
     return {
       carrier_id: carrier.carrierId.value,
       dot_number: carrier.dotNumber.value,

@@ -11,7 +11,10 @@ import type { ICarrierRepository } from '../../../../domain/carrier/repositories
 import { CARRIER_REPOSITORY } from '../../../../domain/carrier/repositories/carrier.repository.interface.js';
 import { HashGeneratorDomainService } from '../../../../domain/carrier/services/hash-generator.domain-service.js';
 import { ScoringDomainService } from '../../../../domain/carrier/services/scoring.domain-service.js';
-import { Carrier } from '../../../../domain/carrier/entities/carrier.entity.js';
+import {
+  Carrier,
+  CCFData,
+} from '../../../../domain/carrier/entities/carrier.entity.js';
 import { CarrierId } from '../../../../domain/carrier/value-objects/carrier-id.vo.js';
 
 /**
@@ -142,11 +145,10 @@ export class ProcessCCFFileHandler implements ICommandHandler<
    * @param correlationId Request correlation ID
    */
   private async processCarrierRecord(
-    ccfData: any,
+    ccfData: CCFData,
     summary: ProcessingSummary,
     correlationId?: string,
   ): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     const carrierId = CarrierId.create(ccfData.carrier_id);
 
     // Check if carrier exists
