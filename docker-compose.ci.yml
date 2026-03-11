@@ -11,8 +11,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
       target: production  # Use production target (pre-compiled)
-      cache_from:
-        - type=gha
+      # Note: Removed cache_from to force fresh build after Dockerfile changes
     environment:
       NODE_ENV: production
       PORT: 3001
@@ -36,8 +35,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       target: production  # Use production target
-      cache_from:
-        - type=gha
+      # Note: Removed cache_from to force fresh build after Dockerfile changes
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: http://localhost:3001
