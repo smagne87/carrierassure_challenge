@@ -14,14 +14,25 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat curl
 
 # ========================================
-# Stage 2: Dependencies
+# Stage 2: Dependencies (Production only)
 # ========================================
 FROM base AS dependencies
 
 # Copy package files
 COPY package.json package-lock.json ./
 
-# Install all dependencies (including devDependencies for build)
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# ========================================
+# Stage 2b: Build Dependencies
+# ========================================
+FROM base AS build-deps
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install ALL dependencies (including devDependencies for build)
 RUN npm ci
 
 # ========================================
@@ -29,8 +40,8 @@ RUN npm ci
 # ========================================
 FROM base AS development
 
-# Copy dependencies from dependencies stage
-COPY --from=dependencies /app/node_modules ./node_modules
+# Copy ALL dependencies from build-deps stage (includes devDependencies)
+COPY --from=build-deps /app/node_modules ./node_modules
 
 # Copy source code
 COPY . .
@@ -46,8 +57,8 @@ CMD ["npm", "run", "start:dev"]
 # ========================================
 FROM base AS builder
 
-# Copy dependencies
-COPY --from=dependencies /app/node_modules ./node_modules
+# Copy ALL dependencies (needed for build)
+COPY --from=build-deps /app/node_modules ./node_modules
 
 # Copy source code
 COPY . .
@@ -63,11 +74,11 @@ FROM base AS production
 # Set NODE_ENV
 ENV NODE_ENV=production
 
-# Copy package files
+# Copy package files for reference
 COPY package.json package-lock.json ./
 
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Copy production dependencies from dependencies stage
+COPY --from=dependencies /app/node_modules ./node_modules
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
