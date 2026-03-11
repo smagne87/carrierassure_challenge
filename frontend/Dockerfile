@@ -14,7 +14,7 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat curl
 
 # ========================================
-# Stage 2: Dependencies
+# Stage 2: Dependencies (Production only)
 # ========================================
 FROM base AS deps
 WORKDIR /app
@@ -22,7 +22,7 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install only production dependencies
 RUN npm ci --only=production && \
     npm cache clean --force
 
@@ -32,8 +32,11 @@ RUN npm ci --only=production && \
 FROM base AS builder
 WORKDIR /app
 
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci
 
 # Copy application files
 COPY . .
