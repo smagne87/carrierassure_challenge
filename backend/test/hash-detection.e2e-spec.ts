@@ -419,7 +419,9 @@ describe('Hash-Based Change Detection (E2E)', () => {
 
       // Performance assertion: Second upload should be significantly faster
       // (hash comparison vs full processing)
-      console.log(`First upload: ${duration1}ms, Second upload: ${duration2}ms`);
+      console.log(
+        `First upload: ${duration1}ms, Second upload: ${duration2}ms`,
+      );
       console.log(`Speedup: ${(duration1 / duration2).toFixed(2)}x faster`);
 
       // Second upload should be faster (though exact timing varies by environment)

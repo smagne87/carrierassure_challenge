@@ -87,7 +87,7 @@ describe('CarrierTable', () => {
         createMockCarrier({ currentScore: 85, carrierId: 'MC-HIGH' }),
       ];
 
-      const { container } = render(<CarrierTable carriers={carriers} />);
+      render(<CarrierTable carriers={carriers} />);
 
       const scoreElement = screen.getByText('85.00');
       expect(scoreElement).toHaveClass('text-green-800');

@@ -116,9 +116,11 @@ export class ProcessCCFFileHandler implements ICommandHandler<
         await this.processCarrierRecord(ccfData, summary, correlationId);
       } catch (error) {
         // Log error but continue processing other carriers
+
         this.logger.error(
-          `[${correlationId}] Error processing carrier ${ccfData.carrier_id}: ${error.message}`,
-          error.stack,
+          `[${correlationId}] Error processing carrier ${ccfData.carrier_id}: ${(error as Error).message}`,
+
+          (error as Error).stack,
         );
         throw error; // Re-throw to fail the entire batch (transactional approach)
       }
@@ -144,6 +146,7 @@ export class ProcessCCFFileHandler implements ICommandHandler<
     summary: ProcessingSummary,
     correlationId?: string,
   ): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     const carrierId = CarrierId.create(ccfData.carrier_id);
 
     // Check if carrier exists
@@ -152,6 +155,7 @@ export class ProcessCCFFileHandler implements ICommandHandler<
 
     if (existingCarrier) {
       // Carrier exists - detect changes via hash comparison
+
       const wasUpdated = existingCarrier.updateFromCCFData(
         ccfData,
         this.hashService,
@@ -159,6 +163,7 @@ export class ProcessCCFFileHandler implements ICommandHandler<
 
       if (wasUpdated) {
         // Hash changed - data was modified
+
         this.logger.debug(
           `[${correlationId}] Carrier ${ccfData.carrier_id} changed - recalculating score`,
         );
@@ -172,6 +177,7 @@ export class ProcessCCFFileHandler implements ICommandHandler<
         summary.updated++;
       } else {
         // Hash matched - no changes detected
+
         this.logger.debug(
           `[${correlationId}] Carrier ${ccfData.carrier_id} unchanged - skipping`,
         );
@@ -180,6 +186,7 @@ export class ProcessCCFFileHandler implements ICommandHandler<
       }
     } else {
       // New carrier - create entity with initial hash & score
+
       this.logger.debug(
         `[${correlationId}] New carrier ${ccfData.carrier_id} - creating`,
       );

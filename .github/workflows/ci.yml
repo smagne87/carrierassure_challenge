@@ -34,7 +34,7 @@ jobs:
 
       - name: Run ESLint
         working-directory: backend
-        run: npx eslint "{src,apps,libs,test}/**/*.ts" --max-warnings 100 || true
+        run: npm run lint || true
 
       - name: Check code formatting (Prettier)
         working-directory: backend

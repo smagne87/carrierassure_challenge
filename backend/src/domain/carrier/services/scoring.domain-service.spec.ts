@@ -5,14 +5,8 @@
 // --- END AI-ASSISTED ---
 
 import { ScoringDomainService } from './scoring.domain-service.js';
-import {
-  SafetyRating,
-  SafetyRatingValue,
-} from '../value-objects/safety-rating.vo.js';
-import {
-  AuthorityStatus,
-  AuthorityStatusValue,
-} from '../value-objects/authority-status.vo.js';
+import { SafetyRating } from '../value-objects/safety-rating.vo.js';
+import { AuthorityStatus } from '../value-objects/authority-status.vo.js';
 
 describe('ScoringDomainService', () => {
   let service: ScoringDomainService;

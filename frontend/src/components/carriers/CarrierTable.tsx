@@ -28,12 +28,6 @@ export default function CarrierTable({ carriers }: CarrierTableProps) {
     setSelectedCarrier(null);
   };
 
-  const getScoreColor = (score: number): string => {
-    if (score > 70) return 'text-green-600 bg-green-50';
-    if (score >= 40) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
-  };
-
   const getScoreBadgeColor = (score: number): string => {
     if (score > 70) return 'bg-green-100 text-green-800 border-green-200';
     if (score >= 40) return 'bg-yellow-100 text-yellow-800 border-yellow-200';

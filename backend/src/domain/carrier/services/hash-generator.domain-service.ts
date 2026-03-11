@@ -71,12 +71,15 @@ export class HashGeneratorDomainService {
       .sort()
       .reduce(
         (acc, key) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const value = data[key];
 
           // Recursively canonicalize nested objects
           if (value && typeof value === 'object' && !Array.isArray(value)) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
             acc[key] = JSON.parse(this.canonicalize(value));
           } else {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             acc[key] = value;
           }
 
