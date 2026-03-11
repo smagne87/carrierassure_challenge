@@ -139,10 +139,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Start services with docker-compose
+      - name: Start services with docker compose
         run: |
-          echo "Starting all services with docker-compose..."
-          docker-compose up -d --build
+          echo "Starting all services with docker compose..."
+          docker compose up -d --build
 
       - name: Wait for services to be healthy
         run: |
@@ -227,15 +227,15 @@ jobs:
         if: failure()
         run: |
           echo "=== Backend API Logs ==="
-          docker-compose logs api
+          docker compose logs api
           echo "=== MongoDB Logs ==="
-          docker-compose logs db
+          docker compose logs db
 
       - name: Cleanup
         if: always()
         run: |
-          echo "Stopping docker-compose services..."
-          docker-compose down -v
+          echo "Stopping docker compose services..."
+          docker compose down -v
           echo "✅ Cleanup complete"
 
   summary:
