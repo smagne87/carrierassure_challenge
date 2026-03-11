@@ -166,8 +166,8 @@ jobs:
           for i in {1..24}; do
             echo "Attempt $i/24 at $(date +%T)"
 
-            # Check container health status
-            API_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' carrier-scoring-api 2>/dev/null || echo "unknown")
+            # Check container health status (using CI container name)
+            API_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' carrier-scoring-api-ci 2>/dev/null || echo "unknown")
             echo "  Container health status: $API_HEALTH"
 
             # Try to curl the endpoint

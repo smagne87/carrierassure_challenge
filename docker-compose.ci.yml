@@ -1,48 +1,38 @@
-# Docker Compose override for CI/CD environments
-# This file is used in GitHub Actions to optimize build times
+# --- AI-ASSISTED ---
+# Tool: Claude 4.5 Sonnet
+# Prompt: "Create minimal CI overrides for docker-compose"
+# Modifications: Simplified CI configuration since base is now production-ready
+# --- END AI-ASSISTED ---
+
+# ========================================
+# CI/CD OVERRIDES (Optional)
+# ========================================
+# This file provides CI-specific tweaks
 # Usage: docker compose -f docker-compose.yml -f docker-compose.ci.yml up
+#
+# Note: Since docker-compose.yml is now production-ready by default,
+# this file is optional. You can use just: docker compose up
+# ========================================
 
 services:
   # ========================================
-  # Backend API - Production Target for CI
+  # Backend API - CI Optimizations
   # ========================================
   api:
+    # Force rebuild in CI (ignore cache)
     build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: production  # Use production target (pre-compiled)
-      # Note: Removed cache_from to force fresh build after Dockerfile changes
-    environment:
-      NODE_ENV: production
-      PORT: 3001
-      MONGODB_URI: mongodb://db:27017/carrier-scoring
-      CORS_ORIGINS: http://localhost:3000
-      LOG_LEVEL: info
-      MAX_FILE_SIZE_MB: 10
-    volumes: []  # No volume mounts in CI (use built code)
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-      start_period: 60s  # Faster startup with production build
+      pull: true  # Always pull latest base image
+      no_cache: false  # Allow Docker layer caching for speed
+    # CI-specific container name to avoid conflicts
+    container_name: carrier-scoring-api-ci
 
   # ========================================
-  # Frontend - Production Target for CI
+  # Frontend - CI Optimizations
   # ========================================
   frontend:
+    # Force rebuild in CI (ignore cache)
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      target: production  # Use production target
-      # Note: Removed cache_from to force fresh build after Dockerfile changes
-    environment:
-      NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://localhost:3001
-    volumes: []  # No volume mounts in CI
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-      start_period: 60s  # Faster startup with production build
+      pull: true  # Always pull latest base image
+      no_cache: false  # Allow Docker layer caching for speed
+    # CI-specific container name to avoid conflicts
+    container_name: carrier-scoring-frontend-ci
