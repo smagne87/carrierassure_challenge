@@ -11,7 +11,7 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install dependencies for native modules and health checks
-RUN apk add --no-cache libc6-compat wget
+RUN apk add --no-cache libc6-compat curl
 
 # ========================================
 # Stage 2: Dependencies

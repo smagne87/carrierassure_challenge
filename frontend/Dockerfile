@@ -11,7 +11,7 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install dependencies only when needed
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat curl
 
 # ========================================
 # Stage 2: Dependencies
