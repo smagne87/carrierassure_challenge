@@ -4,8 +4,6 @@
 # Modifications: Added health checks, volumes, networks, proper service dependencies
 # --- END AI-ASSISTED ---
 
-version: '3.8'
-
 services:
   # ========================================
   # MongoDB Database
