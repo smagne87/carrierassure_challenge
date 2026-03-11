@@ -58,10 +58,10 @@ services:
       - carrier-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
-      interval: 15s
+      interval: 10s
       timeout: 10s
-      retries: 5
-      start_period: 60s
+      retries: 12
+      start_period: 120s
 
   # ========================================
   # Frontend (Next.js)
@@ -90,10 +90,10 @@ services:
       - carrier-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 15s
+      interval: 10s
       timeout: 10s
-      retries: 5
-      start_period: 60s
+      retries: 12
+      start_period: 120s
 
 # ========================================
 # Networks

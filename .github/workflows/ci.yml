@@ -142,17 +142,54 @@ jobs:
       - name: Start services with docker compose
         run: |
           echo "Starting all services with docker compose..."
-          docker compose up -d --build
+          # Use production target for faster startup in CI
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+
+      - name: Check container status and logs
+        run: |
+          echo "=== Container Status ==="
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml ps
+          echo ""
+          echo "=== Database Logs (last 50 lines) ==="
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml logs --tail=50 db
+          echo ""
+          echo "=== API Logs (last 100 lines) ==="
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml logs --tail=100 api
+          echo ""
 
       - name: Wait for services to be healthy
         run: |
           echo "Waiting for backend API to be healthy..."
-          echo "This may take up to 3 minutes for initial build and container startup..."
-          timeout 180 bash -c 'until curl -f http://localhost:3001/api/health > /dev/null 2>&1; do
-            echo "Waiting for API... (attempt at $(date +%T))"
+          echo "Using production build for faster startup in CI..."
+
+          # Monitor health status
+          for i in {1..24}; do
+            echo "Attempt $i/24 at $(date +%T)"
+
+            # Check container health status
+            API_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' carrier-scoring-api 2>/dev/null || echo "unknown")
+            echo "  Container health status: $API_HEALTH"
+
+            # Try to curl the endpoint
+            if curl -f http://localhost:3001/api/health > /dev/null 2>&1; then
+              echo "✅ Backend API is healthy and responding!"
+              exit 0
+            fi
+
+            # If unhealthy, show recent logs
+            if [ "$API_HEALTH" = "unhealthy" ]; then
+              echo "  ⚠️  Container marked as unhealthy. Recent logs:"
+              docker compose -f docker-compose.yml -f docker-compose.ci.yml logs --tail=20 api
+            fi
+
             sleep 5
-          done'
-          echo "✅ Backend API is healthy"
+          done
+
+          echo "❌ Timeout waiting for API to be healthy"
+          echo ""
+          echo "=== Final API Logs ==="
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml logs api
+          exit 1
 
       - name: Run integration smoke tests
         run: |
@@ -228,15 +265,15 @@ jobs:
         if: failure()
         run: |
           echo "=== Backend API Logs ==="
-          docker compose logs api
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml logs api
           echo "=== MongoDB Logs ==="
-          docker compose logs db
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml logs db
 
       - name: Cleanup
         if: always()
         run: |
           echo "Stopping docker compose services..."
-          docker compose down -v
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml down -v
           echo "✅ Cleanup complete"
 
   summary:

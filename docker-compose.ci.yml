@@ -1,0 +1,50 @@
+# Docker Compose override for CI/CD environments
+# This file is used in GitHub Actions to optimize build times
+# Usage: docker compose -f docker-compose.yml -f docker-compose.ci.yml up
+
+services:
+  # ========================================
+  # Backend API - Production Target for CI
+  # ========================================
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production  # Use production target (pre-compiled)
+      cache_from:
+        - type=gha
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGODB_URI: mongodb://db:27017/carrier-scoring
+      CORS_ORIGINS: http://localhost:3000
+      LOG_LEVEL: info
+      MAX_FILE_SIZE_MB: 10
+    volumes: []  # No volume mounts in CI (use built code)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 60s  # Faster startup with production build
+
+  # ========================================
+  # Frontend - Production Target for CI
+  # ========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production  # Use production target
+      cache_from:
+        - type=gha
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+    volumes: []  # No volume mounts in CI
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 60s  # Faster startup with production build
