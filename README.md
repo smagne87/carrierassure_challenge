@@ -570,7 +570,6 @@ jobs:
 
 ## 📚 Additional Resources
 
-- **Architecture Documentation**: See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
 - **API Documentation**: http://localhost:3001/api/docs (when running)
 - **Swagger JSON**: http://localhost:3001/api/docs-json
 
